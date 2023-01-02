@@ -25,3 +25,26 @@ Creating a video streaming security system is not a simple thing. AWS provides s
 PHASE 2
 
 <img src="../images/pres.jpg" width="800" height="500" />
+
+This type of architecture requires several connected microservices, including Cloudfront, API Gateway, S3, and Lambda.
+Let’s look at how user request flow as illustrated in Figure 1 above works.
+
+    path pattern: *
+    Note: Before signing the URL, you want to verify if the user is authorized to watch the requested content. Only if this is the case, you sign the URL and return it back to the client application.
+    Client requests a first signed URL to *.m3u8 file by making API call to the backend. The url signed is returned.
+    
+    path pattern: *.m3u8
+    Client requests *.m3u8 file, passing custom query params Key-Pair-Id-PREFIX, Policy-PREFIX and Signature-PREFIX.
+    CloudFront behavior is matched and request is forwarded to the origin.
+    CloudFront makes origin request and passes custom headers.
+    API Gateway forwards the request to Lambda that has proxy integration configured with a greedy path variable ({proxy+}). This will allow Lambda function to programmatically identify how to get the manifest from S3 bucket in the next step.
+    Lambda function gets the original *.m3u8 manifest file from S3.
+    Lambda function modifies the .m3u8 manifest by appending signed URL params to each *.ts file name.
+    
+    path pattern: *.ts
+    Client requests *.ts file, passing query params as part of request URL.
+    CloudFront behavior is matched and request is forwarded to the origin.
+    CloudFront makes origin request to S3 and returns *.ts file.
+
+
+<img src="../images/events.png" width="1000" height="600" />
