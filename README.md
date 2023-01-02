@@ -28,7 +28,7 @@ Morgan Malavasi
 ---|---
 
 
-## [License](https://github.com/iharsh234/WebApp/blob/master/LICENSE.md)
+## [License](link)
 
 
 
