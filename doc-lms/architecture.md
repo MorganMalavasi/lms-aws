@@ -27,11 +27,11 @@ PHASE 2
 <img src="../images/pres.jpg" width="800" height="500" />
 
 This type of architecture requires several connected microservices, including Cloudfront, API Gateway, S3, and Lambda.
-Let’s look at how user request flow as illustrated in Figure 1 above works.
+Let’s look at how user request flow as illustrated in figure above works.
 
     path pattern: *
     Note: Before signing the URL, you want to verify if the user is authorized to watch the requested content. Only if this is the case, you sign the URL and return it back to the client application.
-    Client requests a first signed URL to *.m3u8 file by making API call to the backend. The url signed is returned.
+    Client requests a first URL representing a specific file by making API call to the backend. If the user is allowed to see the content then the url is signed and returned.
     
     path pattern: *.m3u8
     Client requests *.m3u8 file, passing custom query params Key-Pair-Id-PREFIX, Policy-PREFIX and Signature-PREFIX.
@@ -48,3 +48,41 @@ Let’s look at how user request flow as illustrated in Figure 1 above works.
 
 
 <img src="../images/events.png" width="1000" height="600" />
+
+
+# Implementation in AWS
+Let's start by implementing the first part of the service (phase 1), i.e. the transformation service of the .mp4 video into an HLS stream. First, we need to declare two buckets. An input bucket where videos in .mp4 format are collected. And an output bucket where the hls streams will be collected.
+We will call them input-bucket-terraform-lms-hls-streaming and output-bucket-terraform-lms-hls-streaming.
+- input-bucket-terraform-lms-hls-streaming 
+    - properties
+
+    <img src="../images/input-bucket/1.png" width="1000" height="450" />
+    <img src="../images/input-bucket/2.png" width="1000" height="450" />
+    <img src="../images/input-bucket/3.png" width="1000" height="450" />
+    <img src="../images/input-bucket/4.png" width="1000" height="450" />
+
+    - permissions
+
+    <img src="../images/input-bucket/5.png" width="1000" height="450" />
+    <img src="../images/input-bucket/6.png" width="1000" height="450" />
+    <img src="../images/input-bucket/7.png" width="1000" height="450" />
+
+- output-bucket-terraform-lms-hls-streaming
+    - properties
+
+    <img src="../images/output-bucket/1.png" width="1000" height="450" />
+    <img src="../images/output-bucket/2.png" width="1000" height="450" />
+    <img src="../images/output-bucket/3.png" width="1000" height="450" />
+    <img src="../images/output-bucket/4.png" width="1000" height="450" />
+
+    - permissions
+
+    <img src="../images/output-bucket/5.png" width="1000" height="450" />
+    <img src="../images/output-bucket/6.png" width="1000" height="450" />
+    <img src="../images/output-bucket/7.png" width="1000" height="450" />
+    <img src="../images/output-bucket/8.png" width="1000" height="450" />
+
+
+
+
+Between these two buckets we find two services which are a Lambda function and MediaConvert. Whenever a video is loaded into the input bucket the Lambda function will be triggered to trigger a job on MediaConvert
