@@ -1,6 +1,6 @@
 # Implementation in AWS
 
-<img src="../images/video_on_demand.png" width="700" height="400" />
+<img src="../images/general/video_on_demand.png" width="700" height="400" />
 
 
 Let's start by implementing the first part of the service (phase 1), i.e. the transformation service of the .mp4 video into an HLS stream. First, we need to declare two buckets. An input bucket (source) where videos in .mp4 format are collected. And an output bucket (destination) where the hls streams will be collected.
