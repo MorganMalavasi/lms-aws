@@ -238,3 +238,39 @@ The code is the following
 
 
 The settings of the lambda function are :
+
+<img src="../images/lambda-retrieve/1.png" width="900" height="300" />
+
+<img src="../images/lambda-retrieve/2.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/3.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/4.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/5.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/6.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/7.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/8.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/9.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/10.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/11.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/12.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/13.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/14.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/15.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/16.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/17.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/18.png" width="900" height="400" />
