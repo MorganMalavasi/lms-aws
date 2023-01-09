@@ -123,3 +123,118 @@ Then, it is mandatory to go in the "key management -> public groups" and create 
 
 <img src="../images/cloudfront/key-group.png" width="800" height="500" />
 
+We have implemented the request to the backend, now the package is signed and cloudfront is able to consume the request. However we have not yet determined the response we want cloudfront to return to us.
+
+<img src="../images/general/pres_sec.jpg" width="800" height="430" />
+
+
+As shown in architecture, we need to recover our .m3u8 file. However we must not only recover it, but we must also modify its content. In fact, as explained above, it contains the url to the resources that will be needed later. Cloudfront is obviously unable to do this. We then use a lambda function, which will fetch the file and modify it for us. However, merging a Lambda function with a service like Cloudfront is also impossible, as you need a bridge between them. You can use API gateway. AP-GTW is a service that allows you to create APIs, which can therefore be called through a link.
+The procedure will then be like the one in the figure above. Cloudfront will consume the parameters listed above (expires-signature-keypairid) and validate the request, if so it will call the dedicated API on AP-GTW passing it the resource you want to obtain in query. The api will be defined through a lambda function.
+
+We then create a new api in AP-GTW
+
+<img src="../images/api-gtw/1.png" width="1000" height="110" />
+
+<img src="../images/api-gtw/2.png" width="900" height="400" />
+
+<img src="../images/api-gtw/3.png" width="900" height="400" />
+
+The api will be attached to a lambda. We define a new lambda function, written in python to do so.
+
+
+<img src="../images/lambda-retrieve/general1.png" width="900" height="400" />
+
+<img src="../images/lambda-retrieve/general2.png" width="900" height="400" />
+
+The code is the following
+
+        import os, sys
+        import subprocess
+        import multiprocessing as mp
+
+        # pip install custom package to /tmp/ and add to path
+        subprocess.call('pip install cryptography==36.0.0 -t /tmp/ --no-cache-dir'.split(), 
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        sys.path.insert(1, '/tmp/')
+        import json
+        import boto3
+        import datetime
+        import time
+        from cryptography.hazmat.backends import default_backend
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
+        from botocore.signers import CloudFrontSigner
+
+        def lambda_handler(event, context):
+            print(mp.cpu_count())
+            path = event['queryStringParameters']['hour']
+            path_splitted = path.split("/")
+            
+            ASSETS = path_splitted[1]
+            HASH_DIR = path_splitted[2]
+            HLS = path_splitted[3]
+            FILE = path_splitted[4]
+            
+            # retrieve element from the bucket 
+            s3Client = boto3.client(
+                's3',
+                region_name='eu-south-1'
+                )
+                
+            bucketName = 'output-bucket-terraform-lms-hls-streaming'
+            
+            file_to_read_base = '' + ASSETS + '/' + HASH_DIR + '/' + HLS + '/'
+            file_to_read_init = file_to_read_base + FILE
+            file_content = s3Client.get_object(Bucket=bucketName, Key=file_to_read_init)["Body"].read().decode('utf-8')
+            
+            lines = file_content.split('\n')
+            counter = 0
+            
+            key_id = 'K1************'
+            urlCloudfront = 'https://d1r***********.cloudfront.net/'
+
+            expire_date = datetime.datetime.now() + datetime.timedelta(days=1)
+            cloudfront_signer = CloudFrontSigner(key_id, rsa_signer)
+            for i in range(len(lines)):
+                line = lines[i]
+                '''
+                print("line {0} -> {1}".format(counter, line))
+                counter += 1
+                '''
+                
+                # sign elements in the file if it doesn't start with #
+                if len(line)>0:
+                    if line[0] != '#':
+                        # sign
+                        line = cloudfront_signer.generate_presigned_url(
+                            urlCloudfront + file_to_read_base + line, 
+                            date_less_than=expire_date)
+                        print(line)
+                
+                lines[i] = line
+                
+            # recompose the string
+            file_content = ''
+            for line in lines: file_content += (line + '\n')
+            # return the elements
+            return {
+                'statusCode': 200,
+                'headers' : {
+                    "Content-Type" : "audio/mpegurl"  
+                },
+                'body': file_content
+            }
+
+        def rsa_signer(message):
+            with open('private_key.pem', 'rb') as key_file:
+                private_key = serialization.load_pem_private_key(
+                    key_file.read(),
+                    password=None,
+                    backend=default_backend()
+                )
+            signed = private_key.sign(message, padding.PKCS1v15(), hashes.SHA1())
+            return signed
+
+
+The settings of the lambda function are :
