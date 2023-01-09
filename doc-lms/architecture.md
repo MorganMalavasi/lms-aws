@@ -53,3 +53,5 @@ Let’s look at how user request flow as illustrated in figure above works.
 [build phase 1](/doc-lms/phase1.md)
 
 [build phase 2](/doc-lms/phase2.md)
+
+[automatization with terraform 3](/doc-lms/terraform.md)

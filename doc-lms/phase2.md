@@ -274,3 +274,17 @@ The settings of the lambda function are :
 <img src="../images/lambda-retrieve/17.png" width="900" height="400" />
 
 <img src="../images/lambda-retrieve/18.png" width="900" height="400" />
+
+The Lambda function described above retrieves and signs packages for .m3u8 files. Once we have the list of all signed .ts packages, we can fetch them directly from the output bucket. 
+When a resource of type .m3u8 is requested, a request is made to the API described above, when instead it is a question of retrieving a resource of type .ts, then we can retrieve it directly from the output bucket. 
+To achieve this ambivalent behavior we need to declare a new behavior in cloudfront. We had already declared the general behavior, which will remain valid for .ts files. It is now necessary to declare a behavior for .m3u8 files.
+
+We first declare a new origin, specifying the API described above
+<img src="../images/cloudfront/origin.png" width="900" height="200" />
+
+Then we define a new default behavior, which will therefore affect everything that is not a .ts, i.e. all .m3u8 files.
+<img src="../images/cloudfront/behaviour.png" width="900" height="180" />
+
+
+The architecture is completed. To test the architecture, the best way is to log some resource link returned from the back end, and with Postman, to try to obtain the .m3u8 and .ts file signed.
+

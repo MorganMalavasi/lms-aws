@@ -21,7 +21,7 @@ In the second part of the project we create an instance on a server of a java sp
 
 
 ## Team
-<img src="images/me.jpg" width="182" height="200" />
+<img src="images/general/me.jpg" width="182" height="200" />
 
 Morgan Malavasi
 
